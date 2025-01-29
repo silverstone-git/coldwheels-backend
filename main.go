@@ -3,21 +3,23 @@ package main
 import (
 	"coldwheels/middleware"
 	"coldwheels/models"
+	imageUpload "coldwheels/repository"
+	"crypto/rand"
+	"encoding/base64"
+	"errors"
 	"net/http"
 	"os"
+	"strings"
 	"time"
-	"encoding/base64"
-	"crypto/rand"
-  "errors"
-  "strings"
 
-  "github.com/joho/godotenv"
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
-	"gorm.io/driver/postgres"
-  "fmt"
+	"github.com/joho/godotenv"
 	"golang.org/x/crypto/argon2"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
@@ -85,6 +87,7 @@ func main() {
 		auth.POST("/api/cars", createCar)
 		auth.PUT("/api/cars/:id", updateCar)
 		auth.DELETE("/api/cars/:id", deleteCar)
+		auth.POST("/api/cars/upload-images", imageUpload.UploadImagesHandler)
 	}
 
 	// Start server

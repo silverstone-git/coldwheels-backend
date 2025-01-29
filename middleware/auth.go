@@ -7,7 +7,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
-  "github.com/joho/godotenv"
 )
 
 type Claims struct {
@@ -17,10 +16,6 @@ type Claims struct {
 
 
 func AuthMiddleware(JwtSecret []byte) gin.HandlerFunc {
-  err := godotenv.Load()
-  if err != nil {
-      fmt.Println("Error loading .env file")
-  }
 
   fmt.Println("jwt secret is: ", JwtSecret)
 
@@ -71,12 +66,6 @@ func AuthMiddleware(JwtSecret []byte) gin.HandlerFunc {
         return
     }
 
-
-    // if config.TokenAudience != "" && !claims.VerifyAudience(config.TokenAudience, true) {
-    //     c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid token audience"})
-    //     c.Abort()
-    //     return
-    // }
 
     c.Set("claims", claims)
     c.Set("userID", claims.UserID)

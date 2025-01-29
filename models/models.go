@@ -24,3 +24,15 @@ type Car struct {
 	OwnerID      string
   ImageURLs    pq.StringArray `gorm:"type:text[];size:10"`
 }
+
+type CarReceived struct {
+	Make         string
+	ModelName        string
+	Year         int
+	EngineSize   float64
+	FuelType     string
+	Transmission string
+	OwnerID      string
+  ImageURLs    []byte
+}
+
