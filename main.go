@@ -36,6 +36,22 @@ type CarRequest struct {
 var JwtSecret []byte
 var db *gorm.DB
 
+func CORSMiddleware(allowedOrigin string) gin.HandlerFunc {
+    return func(c *gin.Context) {
+        c.Writer.Header().Set("Access-Control-Allow-Origin", allowedOrigin)
+        c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+        c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+        c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT")
+
+        if c.Request.Method == "OPTIONS" {
+            c.AbortWithStatus(204)
+            return
+        }
+
+        c.Next()
+    }
+}
+
 func main() {
 
   err := godotenv.Load()
@@ -44,6 +60,8 @@ func main() {
       return
   }
   JwtSecret = []byte(os.Getenv("JWT_SECRET"))
+
+
 
   host := os.Getenv("DB_HOST")
   if host == "" {
@@ -74,9 +92,14 @@ func main() {
 	// Initialize Gin
 	r := gin.Default()
 
+  allowedOrigin := os.Getenv("CORS_ALLOWED_ORIGIN")
+  fmt.Println("allowed: ", allowedOrigin)
+  r.Use(CORSMiddleware(allowedOrigin))
+
 	// Auth routes
-	r.POST("/signup", signup)
-	r.POST("/login", login)
+	r.POST("/api/signup", signup)
+	r.POST("/api/login", login)
+
 
 	// Protected routes
 	auth := r.Group("/")
@@ -110,8 +133,10 @@ func signup(c *gin.Context) {
   if db == nil {
     c.JSON(http.StatusInternalServerError, gin.H{"error": "Database connection is not initialized"})
     return
-}
+  }
 
+  fmt.Println(user)
+  fmt.Println("db creation hath begun:")
 	if result := db.Create(&user); result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": result.Error.Error()})
 		return
@@ -153,13 +178,16 @@ func login(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"token": tokenString})
+	c.JSON(http.StatusOK, gin.H{"token": tokenString, "success": "success"})
 }
 
 // Car Handlers
 func getCars(c *gin.Context) {
 	var cars []models.Car
 	userID := c.MustGet("userID").(string)
+  fmt.Println("user id from context: ", userID)
+
+
 	db.Where("owner_id = ?", userID).Find(&cars)
 	c.JSON(http.StatusOK, cars)
 }
@@ -260,7 +288,7 @@ func deleteCar(c *gin.Context) {
 	}
 
 	db.Delete(&car)
-	c.JSON(http.StatusOK, gin.H{"message": "Car deleted"})
+  c.JSON(http.StatusOK, gin.H{"message": "Car deleted", "success": "success"})
 }
 
 // Helpers
@@ -285,8 +313,6 @@ func HashPassword(password string) (string, error) {
 
   output := fmt.Sprintf("$argon2id$v=19$m=%d,t=%d,p=%d$%s$%s", 64, 1, 4, saltString, hashString)
 
-  fmt.Println("hash hash ke")
-  fmt.Println(output)
   return output, nil
 }
 
