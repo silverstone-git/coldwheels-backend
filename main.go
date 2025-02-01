@@ -31,7 +31,7 @@ type CarRequest struct {
 	EngineSize   float64  `json:"engineSize"`
 	FuelType     string   `json:"fuelType"`
 	Transmission string   `json:"transmission"`
-	ImageURLs    []string `json:"imageUrls"`
+	ImageURLs    []string `json:"imageURLs"`
 }
 
 var JwtSecret []byte
@@ -205,7 +205,7 @@ func getCars(c *gin.Context) {
   }
 
   pageSizeStr := c.Query("pageSize")
-  pageSize := 9
+  pageSize := 6
   if pageSizeStr != "" {
       var err error
       pageSize, err = strconv.Atoi(pageSizeStr)
@@ -238,6 +238,7 @@ func createCar(c *gin.Context) {
   // Check the number of cars owned by the user
 	var carCount int64
 	db.Model(&models.Car{}).Where("owner_id = ?", userID).Count(&carCount)
+  fmt.Println("car count is: ", carCount)
 	if carCount >= 20 {
 		c.JSON(http.StatusForbidden, gin.H{"error": "You cannot own more than 20 cars"})
 		return

@@ -32,11 +32,17 @@ type SpacesUploader struct {
 func NewSpacesUploader() (*manager.Uploader, error) {
 
   cfg, err := config.LoadDefaultConfig(context.TODO())
+
+  fmt.Println("config in new uploader maker function is: ", cfg)
   if err != nil {
     return nil, errors.New("cant make config using stuff")
   }
 
+  //
+  // Go TODO
+  //
   client := s3.NewFromConfig(cfg)
+  fmt.Println("client: ", client)
 
   uploader := manager.NewUploader(client)
   return uploader, nil
@@ -56,32 +62,24 @@ func UploadImagesHandler(c *gin.Context) {
 
     spacesKey := os.Getenv("SPACES_KEY")
     // spacesSecret := os.Getenv("SPACES_SECRET")
-    // spacesEndpoint := os.Getenv("SPACES_ENDPOINT")
-    // spacesRegion := os.Getenv("SPACES_REGION")
     spacesBucket := os.Getenv("SPACES_BUCKET")
-    // spacesCDNUrl := os.Getenv("SPACES_CDNURL")
-
-    // cfg := SpacesConfig{
-    //     Key: spacesKey,
-    //     Secret: spacesSecret,
-    //     Endpoint: spacesEndpoint,
-    //     Region: spacesRegion,
-    //     Bucket: spacesBucket,
-    //     CDNUrl: spacesCDNUrl,
-    // }
-    //
+    // spacesEndpoint := os.Getenv("SPACES_ENDPOINT")
+    // spacesBucketEndpoint := os.Getenv("SPACES_BUCKET_ENDPOINT")
+    // spacesRegion := os.Getenv("SPACES_REGION")
 
     form, err := c.MultipartForm()
     if err != nil {
         c.JSON(400, gin.H{"error": "Failed to parse multipart form"})
         return
     }
+    fmt.Println("form is: ", form);
 
     files := form.File["images"]
     if len(files) == 0 {
         c.JSON(400, gin.H{"error": "No images provided"})
         return
     }
+    fmt.Println("files is: ", files);
 
     // Initialize uploader (you might want to do this once at startup)
     uploader, err := NewSpacesUploader()
@@ -102,13 +100,17 @@ func UploadImagesHandler(c *gin.Context) {
           return
       }
 
+      fmt.Println("file opened: ")
       fmt.Println(fileO)
+      fmt.Println("spaces key is: ")
+      fmt.Println(spacesKey)
 
       result, err := uploader.Upload(context.TODO(), &s3.PutObjectInput{
         Bucket: aws.String(spacesBucket),
         Key:    aws.String(spacesKey),
         Body:   fileO,
       })
+      fmt.Println("result is: ", result)
 
       if err != nil {
           c.JSON(500, gin.H{"error": fmt.Sprintf("Failed to upload images: %v", err)})
