@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+  "strconv"
 	"time"
 
 	"fmt"
@@ -106,7 +107,7 @@ func main() {
 
   auth.Use(middleware.AuthMiddleware(JwtSecret))
 	{
-		auth.GET("/api/cars", getCars)
+    auth.GET("/api/cars/:page", getCars)
 		auth.POST("/api/cars", createCar)
 		auth.PUT("/api/cars/:id", updateCar)
 		auth.DELETE("/api/cars/:id", deleteCar)
@@ -188,10 +189,32 @@ func getCars(c *gin.Context) {
 	var cars []models.Car
   fmt.Println("context is: ", c)
 	userID := c.MustGet("UserID").(string)
+
   fmt.Println("user id from context: ", userID)
 
 
-	db.Where("owner_id = ?", userID).Find(&cars)
+  pageStr := c.Param("page")
+
+  page := 1
+  if pageStr != "" {
+      var err error
+      page, err = strconv.Atoi(pageStr)
+      if err != nil || page < 1 {
+          page = 1 // Ensure page is at least 1
+      }
+  }
+
+  pageSizeStr := c.Query("pageSize")
+  pageSize := 9
+  if pageSizeStr != "" {
+      var err error
+      pageSize, err = strconv.Atoi(pageSizeStr)
+      fmt.Println("err: ", err)
+  }
+
+  offset := (page - 1) * pageSize
+
+	db.Where("owner_id = ?", userID).Limit(pageSize).Offset(offset).Find(&cars)
 	c.JSON(http.StatusOK, cars)
 }
 
