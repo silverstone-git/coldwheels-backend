@@ -167,6 +167,8 @@ func login(c *gin.Context) {
 		return
 	}
 
+  fmt.Println("userid being created: ", user.ID)
+
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"userID": user.ID,
 		"exp":    time.Now().Add(time.Hour * 24).Unix(),
@@ -184,7 +186,8 @@ func login(c *gin.Context) {
 // Car Handlers
 func getCars(c *gin.Context) {
 	var cars []models.Car
-	userID := c.MustGet("userID").(string)
+  fmt.Println("context is: ", c)
+	userID := c.MustGet("UserID").(string)
   fmt.Println("user id from context: ", userID)
 
 
@@ -205,7 +208,9 @@ func createCar(c *gin.Context) {
 		return
 	}
 
-	userID := c.MustGet("userID").(string)
+	userID := c.MustGet("UserID").(string)
+
+  fmt.Println("userID is: ", userID)
 
   // Check the number of cars owned by the user
 	var carCount int64
@@ -254,7 +259,7 @@ func updateCar(c *gin.Context) {
 		return
 	}
 
-	if car.OwnerID != c.MustGet("userID").(string) {
+	if car.OwnerID != c.MustGet("UserID").(string) {
 		c.JSON(http.StatusForbidden, gin.H{"error": "Not authorized"})
 		return
 	}
@@ -282,7 +287,7 @@ func deleteCar(c *gin.Context) {
 		return
 	}
 
-	if car.OwnerID != c.MustGet("userID").(string) {
+	if car.OwnerID != c.MustGet("UserID").(string) {
 		c.JSON(http.StatusForbidden, gin.H{"error": "Not authorized"})
 		return
 	}

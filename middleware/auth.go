@@ -10,7 +10,7 @@ import (
 )
 
 type Claims struct {
-    UserID string   `json:"user_id"`
+    UserID string   `json:"userID"`
     jwt.RegisteredClaims
 }
 
@@ -37,8 +37,6 @@ func AuthMiddleware(JwtSecret []byte) gin.HandlerFunc {
 
     tokenString := parts[1]
 
-    fmt.Println("tokenString got from request: ", tokenString)
-
     // Parse and validate the token
     claims := &Claims{}
     token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
@@ -47,8 +45,6 @@ func AuthMiddleware(JwtSecret []byte) gin.HandlerFunc {
         }
         return JwtSecret, nil
     })
-
-    fmt.Println("token after parsing: ", tokenString)
 
     if err != nil {
         if err == jwt.ErrTokenExpired {
@@ -66,11 +62,10 @@ func AuthMiddleware(JwtSecret []byte) gin.HandlerFunc {
         return
     }
 
-
     c.Set("claims", claims)
-    c.Set("userID", claims.UserID)
+    c.Set("UserID", claims.UserID)
 
-    fmt.Println("claims are: ",)
+    fmt.Println("uid are: ", claims.UserID)
 
 		c.Next()
 	}
