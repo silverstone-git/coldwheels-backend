@@ -31,6 +31,7 @@ type CarRequest struct {
 	EngineSize   float64  `json:"engineSize"`
 	FuelType     string   `json:"fuelType"`
 	Transmission string   `json:"transmission"`
+	Description string   `json:"description"`
 	ImageURLs    []string `json:"imageURLs"`
 }
 
@@ -88,6 +89,7 @@ func main() {
 
 
 	// Migrate the schema
+  // db.AutoMigrate(&lib.User{}, &lib.Car{})
 
 	// Initialize Gin
 	r := gin.Default()
@@ -258,6 +260,7 @@ func createCar(c *gin.Context) {
 		EngineSize:   req.EngineSize,
 		FuelType:     req.FuelType,
 		Transmission: req.Transmission,
+		Description: req.Description,
 		OwnerID:      userID,
 		ImageURLs:    req.ImageURLs,
 	}

@@ -21,6 +21,7 @@ type Car struct {
 	EngineSize   float64
 	FuelType     string
 	Transmission string
+	Description string
 	OwnerID      string
   ImageURLs    pq.StringArray `gorm:"type:text[];size:10"`
 }
@@ -32,6 +33,7 @@ type CarReceived struct {
 	EngineSize   float64
 	FuelType     string
 	Transmission string
+	Description string
 	OwnerID      string
   ImageURLs    []byte
 }
