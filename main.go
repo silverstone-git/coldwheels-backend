@@ -2,7 +2,7 @@ package main
 
 import (
 	"coldwheels/middleware"
-	"coldwheels/models"
+	"coldwheels/lib"
 	imageUpload "coldwheels/repository"
 	"crypto/rand"
 	"encoding/base64"
@@ -88,7 +88,6 @@ func main() {
 
 
 	// Migrate the schema
-	// db.AutoMigrate(&models.User{}, &models.Car{})
 
 	// Initialize Gin
 	r := gin.Default()
@@ -111,6 +110,10 @@ func main() {
 		auth.POST("/api/cars", createCar)
 		auth.PUT("/api/cars/:id", updateCar)
 		auth.DELETE("/api/cars/:id", deleteCar)
+
+    // user uploads image, response is image object keys list
+    // user uploads car data, including image object keys
+    // when getCars() is called, then, for each car image key, the response is a list of presigned urls
 		auth.POST("/api/cars/upload-images", imageUpload.UploadImagesHandler)
 	}
 
@@ -118,9 +121,10 @@ func main() {
 	r.Run(":" + os.Getenv("PORT"))
 }
 
+
 // Auth Handlers
 func signup(c *gin.Context) {
-	var user models.User
+	var user lib.User
 	if err := c.ShouldBindJSON(&user); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -157,7 +161,7 @@ func login(c *gin.Context) {
 		return
 	}
 
-	var user models.User
+	var user lib.User
 	if result := db.Where("email = ?", credentials.Email).First(&user); result.Error != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
 		return
@@ -186,7 +190,7 @@ func login(c *gin.Context) {
 
 // Car Handlers
 func getCars(c *gin.Context) {
-	var cars []models.Car
+	var cars []lib.Car
   fmt.Println("context is: ", c)
 	userID := c.MustGet("UserID").(string)
 
@@ -215,6 +219,9 @@ func getCars(c *gin.Context) {
   offset := (page - 1) * pageSize
 
 	db.Where("owner_id = ?", userID).Limit(pageSize).Offset(offset).Find(&cars)
+
+  imageUpload.PresignUrls(c, cars)
+
 	c.JSON(http.StatusOK, cars)
 }
 
@@ -226,7 +233,7 @@ func createCar(c *gin.Context) {
 	}
 
 	// Validate image URLs
-	if len(req.ImageURLs) > 10 {
+	if len(req.ImageURLs) > lib.ImagesPerCarLimit {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Maximum 10 image URLs allowed"})
 		return
 	}
@@ -237,14 +244,14 @@ func createCar(c *gin.Context) {
 
   // Check the number of cars owned by the user
 	var carCount int64
-	db.Model(&models.Car{}).Where("owner_id = ?", userID).Count(&carCount)
+	db.Model(&lib.Car{}).Where("owner_id = ?", userID).Count(&carCount)
   fmt.Println("car count is: ", carCount)
 	if carCount >= 20 {
 		c.JSON(http.StatusForbidden, gin.H{"error": "You cannot own more than 20 cars"})
 		return
 	}
 
-	car := models.Car{
+	car := lib.Car{
 		Make:         req.Make,
 		ModelName:        req.ModelName,
 		Year:         req.Year,
@@ -277,7 +284,7 @@ func updateCar(c *gin.Context) {
 		return
 	}
 
-	var car models.Car
+	var car lib.Car
 	if result := db.First(&car, id); result.Error != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Car not found"})
 		return
@@ -304,7 +311,7 @@ func updateCar(c *gin.Context) {
 
 func deleteCar(c *gin.Context) {
 	id := c.Param("id")
-	var car models.Car
+	var car lib.Car
 
 	if result := db.First(&car, id); result.Error != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Car not found"})
