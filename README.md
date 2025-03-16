@@ -64,6 +64,26 @@ ColdWheels is a Go-based server that provides a simple REST API for car listings
 
    The server will start on the port specified in your `.env` file.
 
+
+## Installation using Docker Image
+
+- Download the Docker Compose and create the `.env` file
+
+    ```bash
+    curl -L -o ./docker-compose.yaml https://raw.githubusercontent.com/silverstone-git/coldwheels-backend/main/docker-compose.yaml
+    touch .env
+    ```
+
+- Edit the `.env` to your liking by referring to the [Environment Variables](#environment-variables)
+
+- Pull and Up the [docker image](https://hub.docker.com/r/cyt0/gowheels)
+
+    ```bash
+    docker-compose pull
+    docker-compose down
+    docker-compose up -d
+    ```
+
 ## Environment Variables
 
 The project requires certain environment variables to:
