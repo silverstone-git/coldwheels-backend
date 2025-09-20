@@ -1,5 +1,8 @@
-FROM golang:1.24-bookworm
+FROM golang:1.25.1-alpine
+
 WORKDIR /app
+
+RUN apk --no-cache add ca-certificates tzdata
 
 COPY ./.env /app/.env
 COPY ./go.mod /app/go.mod
@@ -10,7 +13,17 @@ COPY ./lib /app/lib
 COPY ./middleware /app/middleware
 COPY ./repository /app/repository
 COPY ./main.go /app/main.go
-RUN GOOS=linux GOARCH=amd64 go build -o ./gowheels
+
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
+    -ldflags='-w -s -extldflags "-static"' \
+    -a -installsuffix cgo \
+    -o gowheels .
+
+RUN adduser -D appuser
+
+RUN chown appuser:appuser gowheels
+
+USER appuser
 
 ENV GIN_MODE=release
 

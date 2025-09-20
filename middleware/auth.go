@@ -17,7 +17,7 @@ type Claims struct {
 
 func AuthMiddleware(JwtSecret []byte) gin.HandlerFunc {
 
-  fmt.Println("jwt secret is: ", JwtSecret)
+  // fmt.Println("jwt secret is: ", JwtSecret)
 
   return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
@@ -65,7 +65,7 @@ func AuthMiddleware(JwtSecret []byte) gin.HandlerFunc {
     c.Set("claims", claims)
     c.Set("UserID", claims.UserID)
 
-    fmt.Println("uid are: ", claims.UserID)
+    fmt.Println("uid during auth middleware: ", claims.UserID)
 
 		c.Next()
 	}

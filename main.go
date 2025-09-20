@@ -67,18 +67,20 @@ func main() {
 
   host := os.Getenv("DB_HOST")
   if host == "" {
-        panic("DATABASE_URL environment variable is not set")
+        panic("DB_HOST environment variable is not set")
   }
 
-  port := "5432"
+  port := os.Getenv("DB_PORT")
   user := os.Getenv("DB_USER")
   password := os.Getenv("DB_PASSWORD")
   dbname := os.Getenv("DB_NAME")
   sslmode := os.Getenv("DB_SSL")
+  pgschema := os.Getenv("DB_SCHEMA")
+  sslrootcert := os.Getenv("DB_SSL_ROOT_CERT")
 
 
-  dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
-        host, port, user, password, dbname, sslmode)
+  dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s sslrootcert=%s search_path=%s",
+        host, port, user, password, dbname, sslmode, sslrootcert, pgschema)
 
 
   db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
@@ -120,7 +122,7 @@ func main() {
 	}
 
 	// Start server
-	r.Run(":" + os.Getenv("PORT"))
+	r.Run(":" + os.Getenv("GIN_PORT"))
 }
 
 
@@ -142,7 +144,7 @@ func signup(c *gin.Context) {
     return
   }
 
-  fmt.Println(user)
+  // fmt.Println(user)
   fmt.Println("db creation hath begun:")
 	if result := db.Create(&user); result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": result.Error.Error()})
@@ -193,10 +195,10 @@ func login(c *gin.Context) {
 // Car Handlers
 func getCars(c *gin.Context) {
 	var cars []lib.Car
-  fmt.Println("context is: ", c)
+  // fmt.Println("context is: ", c)
 	userID := c.MustGet("UserID").(string)
 
-  fmt.Println("user id from context: ", userID)
+  fmt.Println("user id from context during getcars: ", userID)
 
 
   pageStr := c.Param("page")
@@ -215,7 +217,9 @@ func getCars(c *gin.Context) {
   if pageSizeStr != "" {
       var err error
       pageSize, err = strconv.Atoi(pageSizeStr)
-      fmt.Println("err: ", err)
+      if err != nil {
+      	fmt.Println("err: ", err)
+      }
   }
 
   offset := (page - 1) * pageSize
@@ -247,7 +251,7 @@ func createCar(c *gin.Context) {
   // Check the number of cars owned by the user
 	var carCount int64
 	db.Model(&lib.Car{}).Where("owner_id = ?", userID).Count(&carCount)
-  fmt.Println("car count is: ", carCount)
+  fmt.Println("car count during create car is: ", carCount)
 	if carCount >= 20 {
 		c.JSON(http.StatusForbidden, gin.H{"error": "You cannot own more than 20 cars"})
 		return
