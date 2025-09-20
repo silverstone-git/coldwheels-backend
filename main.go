@@ -59,7 +59,6 @@ func main() {
   err := godotenv.Load()
   if err != nil {
       fmt.Println("Error loading .env file")
-      return
   }
   JwtSecret = []byte(os.Getenv("JWT_SECRET"))
 

@@ -52,7 +52,14 @@ func PresignUrls(ctx *gin.Context, cars []lib.Car) ([]lib.Car, error) {
         }
 
         objectKey := strings.TrimPrefix(u.Path, "/")
+
+	// DO THIS extra trimming ONLY IF youre using some s3 endpoint like https://domain/somethingextra
+	pathParts := strings.Split(objectKey, "/")
+	remainingParts := pathParts[1:]
+	objectKey = strings.Join(remainingParts, "/")
+
         fmt.Println("object key from url : ", objectKey)
+
         client, err := NewS3Client()
         if err != nil {
           return nil, err
@@ -148,9 +155,7 @@ func UploadImagesHandler(c *gin.Context) {
 
     err := godotenv.Load()
     if err != nil {
-
         c.JSON(500, gin.H{"error":"Error loading .env file"})
-        return
     }
 
     s3Bucket := os.Getenv("S3_BUCKET")
@@ -203,12 +208,10 @@ func UploadImagesHandler(c *gin.Context) {
       // fmt.Println(fileO)
 
 
-      // TODO: the Key is being used as a file name to save instead of actually using as credential
-
       uid := c.MustGet("UserID").(string)
       result, err := uploader.Upload(context.TODO(), &s3.PutObjectInput{
         Bucket: aws.String(s3Bucket),
-        Key:    aws.String("coldwheels/" + uid + "/" + file.Filename),
+        Key:    aws.String(uid + "/" + file.Filename),
         Body:   fileO,
       })
       fmt.Println("result is: ", result)
