@@ -1,233 +1,234 @@
-# ColdWheels Go Server
+# 🚗 ColdWheels: Fueling Your Next Automotive Masterpiece
 
-ColdWheels is a Go-based server that provides a simple REST API for car listings management. It uses Gin for HTTP routing, GORM for database interactions with PostgreSQL, and JWT for user authentication. It also incorporates image upload functionality with presigned URL generation.
+**Disrupting the garage-to-gallery pipeline with a hyper-scalable, cloud-native solution for showcasing automotive brilliance.**
 
-## Table of Contents
+## 🚀 Mission: Accelerate Everything
 
-- [Features](#features)
-- [Prerequisites](#prerequisites)
-- [Installation](#installation)
-- [Environment Variables](#environment-variables)
-- [Usage](#usage)
-- [API Endpoints](#api-endpoints)
-- [Directory Structure](#directory-structure)
-- [License](#license)
+In a world where every second counts, ColdWheels is the ultimate pit stop for developers building next-generation automotive applications. We provide a robust, secure, and ridiculously fast backend, so you can focus on what matters: building stunning user experiences that move people.
 
-## Features
+## ✨ Why ColdWheels is Your Unfair Advantage:
 
-- User signup and login with JWT authentication.
-- CRUD operations for cars.
-- Pagination support for listing cars.
-- Password security using Argon2 hashing.
-- Image uploading support that returns presigned URLs for car images.
-- CORS handling for frontend integration.
+*   **Blazing-Fast Performance:** Built with Go (Golang), Gin, and a PostgreSQL backend, ColdWheels is engineered for speed. Say goodbye to sluggish APIs and hello to instant gratification.
+*   **Rock-Solid Security:** We've integrated JWT-based authentication and Argon2 password hashing to keep your users' data locked down tighter than a lug nut.
+*   **Infinite Scalability:** With our S3-compatible image upload and presigned URL generation, you can handle a virtually unlimited number of high-resolution images without breaking a sweat.
+*   **Effortless Integration:** A clean, RESTful API and CORS support make it a breeze to connect your frontend, whether it's a web app, mobile app, or a VR showroom.
+*   **Developer-First Experience:** We've done the heavy lifting so you don't have to. With a straightforward setup and clear documentation, you'll be up and running in minutes.
 
-## Prerequisites
+## 🛠️ The Tech Stack: A Symphony of Power and Precision
 
-- [Go](https://golang.org) (version >= 1.16 recommended)
-- [PostgreSQL](https://www.postgresql.org)
-- [Docker](https://www.docker.com) (if you prefer containerized deployment)
-- [Git](https://git-scm.com) for source control
+*   **Go (Golang):** The heart of our engine, providing raw speed and concurrency.
+*   **Gin:** A high-performance HTTP web framework for crafting elegant APIs.
+*   **GORM:** The fantastic ORM library for Go, making database interactions a joy.
+*   **PostgreSQL:** The world's most advanced open-source relational database.
+*   **JWT (JSON Web Tokens):** The industry standard for secure authentication.
+*   **Argon2:** A state-of-the-art password hashing algorithm.
+*   **Docker:** For seamless containerization and deployment.
 
-## Installation
+## 🏁 Get Started in 60 Seconds
 
-1. **Clone the Repository**
+### Prerequisites
+- Docker
+- Docker Compose
+- Git
 
-   ```bash
-   git clone https://github.com/silverstone-git/coldwheels-backend.git
-   cd coldwheels-backend
-   ```
-
-2. **Install Dependencies**
-
-   Use Go modules to install dependencies:
-
-   ```bash
-   go mod download
-   ```
-
-3. **Set Up Database**
-
-   Make sure you have a PostgreSQL instance running. Create a database for the project.
-
-4. **Environment Setup**
-
-   Create a `.env` file in the root directory. See [Environment Variables](#environment-variables) below for details.
-
-5. **Run the Server**
-
-   For local development run:
-
-   ```bash
-   go run main.go
-   ```
-
-   The server will start on the port specified in your `.env` file.
-
-
-## Installation using Docker Image
-
-- Download the Docker Compose and create the `.env` file
-
-    ```bash
-    curl -L -o ./docker-compose.yaml https://raw.githubusercontent.com/silverstone-git/coldwheels-backend/main/docker-compose.yaml
-    touch .env
-    ```
-
-- Edit the `.env` to your liking by referring to the [Environment Variables](#environment-variables)
-
-- Pull and Up the [docker image](https://hub.docker.com/r/cyt0/gowheels)
-
-    ```bash
-    docker-compose pull
-    docker-compose down
-    docker-compose up -d
-    ```
-
-## Environment Variables
-
-The project requires certain environment variables to:
-- Connect to the database.
-- Configure JWT authentication.
-- Set up CORS.
-
-Create a `.env` file in the project root with, for example:
-
-```dotenv
-# Server configuration
-PORT="4054"
-CORS_ALLOWED_ORIGIN="http://localhost:3000" # if your frontend is on local
-
-# JWT
-JWT_SECRET=your_super_secret_key
-
-# Database configuration
-DB_HOST=localhost
-DB_USER=your_db_username
-DB_PASSWORD=your_db_password
-DB_NAME=coldwheels_db
-DB_SSL=disable
-
-# SPACES
-SPACES_BUCKET="your s3 bucket name"
-SPACES_KEY="your s3 key"
-SPACES_SECRET="your s3 secret"
-SPACES_ENDPOINT="your s3 endpoint"
-SPACES_REGION="your s3 region"
-MY_ORIGIN="http://localhost:4054" # if you are running it on local
-
+### 1. Clone the Repository
+```bash
+git clone https://github.com/silverstone-git/coldwheels-backend.git
+cd coldwheels-backend
 ```
 
-> **Note:** Ensure that the `.env` file is in the same directory where you run your Go server so that it can be loaded by [godotenv](https://github.com/joho/godotenv).
+### 2. Environment Setup
+Create a `.env.production` file in the root directory. You can copy the example if it exists:
+```bash
+cp .env.example .env.production
+```
+Populate it with your configuration. See the [Environment Variables](#-environment-variables) section for details.
 
-## Usage
+### 3. Docker Network
+Create the required Docker network:
+```bash
+docker network create --ipv6 --subnet 2001:db8::/64 my_ipv6_network
+```
 
-- **Start the Server:**
+### 4. Launch!
 
-  ```bash
-  go run main.go
-  ```
+#### Using Docker Compose (Recommended)
+This is the easiest way to get up and running.
+```bash
+docker-compose up -d --build
+```
 
-- **Containerized Deployment:**
+#### Using Docker Run
+If you prefer a manual approach:
+```bash
+# First, build the image
+docker build -t wheelsimg .
 
-  You can also build a Docker image using the provided `Dockerfile` and run it via Docker Compose, if available in the repository. For example:
+# Then, run the container
+docker run --env-file .env.production --name wheelc --network my_ipv6_network -d -p 4054:4054 wheelsimg
+```
 
-  ```bash
-  docker-compose up --build
-  ```
+## ⚙️ Environment Variables
 
-## API Endpoints
+Your `.env.production` file configures the application. Here are the key variables:
+
+| Variable              | Description                                           | Example                               |
+| --------------------- | ----------------------------------------------------- | ------------------------------------- |
+| `PORT`                | The port for the server to listen on.                 | `4054`                                |
+| `CORS_ALLOWED_ORIGIN` | The origin allowed for CORS requests.                 | `http://localhost:3000`               |
+| `JWT_SECRET`          | A strong, secret key for signing JWTs.                | `your_super_secret_key`               |
+| `DB_HOST`             | The hostname of your PostgreSQL database.             | `localhost`                           |
+| `DB_PORT`             | The port of your PostgreSQL database.                 | `5432`                                |
+| `DB_USER`             | The username for the database connection.             | `your_db_username`                    |
+| `DB_PASSWORD`         | The password for the database user.                   | `your_db_password`                    |
+| `DB_NAME`             | The name of the database to use.                      | `coldwheels_db`                       |
+| `DB_SSL`              | The SSL mode for the database connection.             | `disable`                             |
+| `S3_BUCKET`           | Your S3-compatible bucket name for image uploads.     | `your-s3-bucket-name`                 |
+| `S3_KEY`              | Your S3-compatible access key.                        | `your-s3-key`                         |
+| `S3_SECRET`           | Your S3-compatible secret key.                        | `your-s3-secret`                      |
+| `S3_ENDPOINT`         | The endpoint URL for your S3-compatible service.      | `your-s3-endpoint`                    |
+| `S3_REGION`           | The region of your S3-compatible service.             | `your-s3-region`                      |
+
+##  API Reference
 
 ### Public Routes
 
-- **POST /api/signup**
+#### `POST /api/signup`
+Registers a new user.
 
-  Registers a new user.
+**Request Body:**
+```json
+{
+  "email": "user@example.com",
+  "password": "your_secure_password"
+}
+```
 
-  **Body:**
-
-  ```json
-  {
+**Success Response (201 Created):**
+```json
+{
+    "ID": "a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6",
+    "CreatedAt": "2025-09-21T10:00:00Z",
+    "UpdatedAt": "2025-09-21T10:00:00Z",
+    "DeletedAt": null,
     "email": "user@example.com",
-    "password": "your_password",
-    "otherField": "..."
-  }
-  ```
+    "password": "hashed_password_here"
+}
+```
 
-- **POST /api/login**
+#### `POST /api/login`
+Authenticates a user and returns a JWT.
 
-  Authenticates a user and returns a JWT token.
+**Request Body:**
+```json
+{
+  "email": "user@example.com",
+  "password": "your_secure_password"
+}
+```
 
-  **Body:**
-
-  ```json
-  {
-    "email": "user@example.com",
-    "password": "your_password"
-  }
-  ```
+**Success Response (200 OK):**
+```json
+{
+    "token": "your.jwt.token",
+    "success": "success"
+}
+```
 
 ### Protected Routes
+All protected routes require an `Authorization` header: `Bearer <your.jwt.token>`.
 
-All protected routes require the JWT token to be attached in the `Authorization` header (e.g., `Bearer <token>`).
+#### `GET /api/cars/:page`
+Retrieves a paginated list of cars for the authenticated user.
+- `:page` (URL parameter): The page number to retrieve.
+- `pageSize` (query parameter, optional): The number of items per page (default: 6).
 
-- **GET /api/cars/:page**
+**Example Request:**
+`GET /api/cars/1?pageSize=10`
 
-  Retrieves a paginated list of cars belonging to the authenticated user. You can also pass the optional query parameter `pageSize`.
-
-- **POST /api/cars**
-
-  Creates a new car entry.
-
-  **Body Schema (CarRequest):**
-
-  ```json
-  {
-    "make": "Toyota",
-    "modelName": "Corolla",
-    "year": 2020,
-    "engineSize": 1.8,
-    "fuelType": "Petrol",
-    "transmission": "Automatic",
-    "description": "A reliable car",
-    "imageURLs": ["image_key1", "image_key2"]
-  }
-  ```
-
-- **PUT /api/cars/:id**
-
-  Updates an existing car. Requires the car's ID as a URL parameter.
-
-- **DELETE /api/cars/:id**
-
-  Deletes a specific car.
-
-- **POST /api/cars/upload-images**
-
-  Handles image uploads and returns a list of object keys. The handler uses presigned URLs for secure uploads.
-
-## Directory Structure
-
-Below is a suggested directory structure for clarity:
-
-```
-coldwheels/
-├── Dockerfile                   # Docker build instructions
-├── docker-compose.yml           # Docker Compose file for local dev (if available)
-├── .env                         # Environment variable definitions (not checked in)
-├── go.mod                       # Go modules file
-├── go.sum                       # Go dependencies checksums file
-├── main.go                      # Main program file, contains server logic
-├── middleware/
-│   └── auth.go                  # Authentication middleware
-├── lib/
-│   └── ...                      # Database model definitions (User, Car, etc.)
-├── repository/
-│   └── imageupload.go           # Logic for handling image uploads
-└── README.md                    # Project README
+**Success Response (200 OK):**
+```json
+[
+    {
+        "ID": 1,
+        "CreatedAt": "2025-09-21T10:00:00Z",
+        "UpdatedAt": "2025-09-21T10:00:00Z",
+        "DeletedAt": null,
+        "Make": "Toyota",
+        "ModelName": "Supra",
+        "Year": 2021,
+        "EngineSize": 3.0,
+        "FuelType": "Petrol",
+        "Transmission": "Automatic",
+        "Description": "A legendary sports car.",
+        "OwnerID": "a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6",
+        "ImageURLs": ["https://presigned-url.com/image1.jpg"]
+    }
+]
 ```
 
-## License
+#### `POST /api/cars`
+Creates a new car entry.
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+**Request Body:**
+```json
+{
+  "make": "Nissan",
+  "modelName": "GT-R",
+  "year": 2022,
+  "engineSize": 3.8,
+  "fuelType": "Petrol",
+  "transmission": "Automatic",
+  "description": "Godzilla in its latest form.",
+  "imageURLs": ["s3-object-key-1.jpg", "s3-object-key-2.jpg"]
+}
+```
 
+**Success Response (201 Created):**
+Returns the newly created car object.
+
+#### `PUT /api/cars/:id`
+Updates an existing car by its ID.
+
+**Request Body:**
+Same as `POST /api/cars`.
+
+**Success Response (200 OK):**
+Returns the updated car object.
+
+#### `DELETE /api/cars/:id`
+Deletes a car by its ID.
+
+**Success Response (200 OK):**
+```json
+{
+    "message": "Car deleted",
+    "success": "success"
+}
+```
+
+#### `POST /api/cars/upload-images`
+Uploads one or more images (up to 10). Send as `multipart/form-data`.
+
+**Success Response (200 OK):**
+```json
+{
+    "urls": [
+        "https://your-s3-service.com/bucket/user-id/image1.jpg",
+        "https://your-s3-service.com/bucket/user-id/image2.jpg"
+    ]
+}
+```
+
+## 🤝 Join the Revolution
+
+ColdWheels is more than just a backend; it's a community of builders, dreamers, and automotive enthusiasts. We're always looking for contributors to help us push the boundaries of what's possible.
+
+**Have an idea? Found a bug? Want to show off what you've built?**
+
+*   **Open an issue:** [https://github.com/silverstone-git/coldwheels-backend/issues](https://github.com/silverstone-git/coldwheels-backend/issues)
+*   **Fork the repo and submit a pull request.**
+
+---
+
+**Licensed under the MIT License. See the [LICENSE](LICENSE) file for details.**

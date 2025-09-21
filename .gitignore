@@ -2,3 +2,4 @@ query.sh
 .env
 .env.production
 cert.crt
+.aiexclude

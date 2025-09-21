@@ -1,12 +1,19 @@
+version: '3.8'
+
 services:
   gowheels:
-    image: ${DOCKER_USERNAME}/gowheels:${LATEST_TAG}
+    image: wheelsimg
+    container_name: wheelc
     build:
       context: .
       dockerfile: Dockerfile
     ports:
       - "4054:4054"
-    environment:
-      - PORT=4054
     env_file:
-      - .env
+      - .env.production
+    networks:
+      - my_ipv6_network
+
+networks:
+  my_ipv6_network:
+    external: true
