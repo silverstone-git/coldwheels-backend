@@ -155,7 +155,8 @@ func UploadImagesHandler(c *gin.Context) {
 
     err := godotenv.Load()
     if err != nil {
-        c.JSON(500, gin.H{"error":"Error loading .env file"})
+        // c.JSON(500, gin.H{"error":"Error loading .env file"})
+  	fmt.Println("Error loading .env file while in upload images handler")
     }
 
     s3Bucket := os.Getenv("S3_BUCKET")
