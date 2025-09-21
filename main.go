@@ -78,13 +78,10 @@ func main() {
   sslrootcert := os.Getenv("DB_SSL_ROOT_CERT")
 
 
-  var dsn
-  if sslrootcert == "" {
-  	dsn = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s sslrootcert=%s search_path=%s",
-        	host, port, user, password, dbname, sslmode, sslrootcert, pgschema)
-  } else {
-  	dsn = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s search_path=%s",
-        	host, port, user, password, dbname, sslmode, pgschema)
+  dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s search_path=%s", host, port, user, password, dbname, sslmode, pgschema)
+
+  if sslrootcert != "" {
+	dsn = fmt.Sprintf("%s sslrootcert=%s", dsn, sslrootcert)
   }
 
   db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
